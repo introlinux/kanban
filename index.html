@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Mi Tablero Kanban Personal</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+       <header>
+        <div class="header-left">
+            <button class="menu-toggle">⋮</button>
+            <h1 id="board-title" contenteditable="true">Mi Tablero Kanban Personal</h1>
+        </div>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Buscar en las tarjetas...">
+            <div id="searchResults" class="search-results"></div>
+        </div>
+        <div class="header-actions">
+            <button id="save-btn" class="btn">Guardar Tablero</button>
+            <button id="export-btn" class="btn">Exportar</button>
+            <button id="import-btn" class="btn">Importar</button>
+        </div>
+    </header>
+
+<!-- Añadir este elemento oculto al HTML, justo después del header -->
+<a id="exportLink" style="display: none;"></a>
+
+    
+    <div class="board-container" id="board">
+        <!-- Las listas se añadirán aquí dinámicamente -->
+        <div class="add-list" id="add-list">+ Añadir Lista</div>
+    </div>
+    
+    <!-- Modal para edición de tarjetas -->
+    <div class="modal" id="card-modal">
+        <div class="modal-content">
+			<div class="modal-header">
+    <div class="modal-header-content">
+        <img id="preview-thumbnail" class="preview-thumbnail" style="display: none;">
+        <div style="flex-grow: 1;">
+            <h3 id="card-title-display" style="margin: 0;"></h3>
+            <input type="text" id="card-title-input" class="card-title-input" 
+                   placeholder="Título de la tarjeta" style="display: none;">
+        </div>
+        <button id="edit-card-btn" class="edit-card-btn">EDITAR</button>
+    </div>
+    <span class="close">&times;</span>
+</div>
+            <div class="modal-body">
+
+                    <div class="editor-toolbar" style="top: 0; margin-top: 0; position: sticky; border-top: none;">
+                    <button data-command="bold">B</button>
+                    <button data-command="italic">I</button>
+                    <button data-command="underline">U</button>
+                    <button data-command="insertOrderedList">Lista numerada</button>
+                    <button data-command="insertUnorderedList">Lista con viñetas</button>
+                    <button data-command="createLink">Enlace</button>
+                    <button data-command="insertImage">Imagen</button>
+                    <button data-command="insertYoutube">YouTube</button>
+                </div>
+                <div class="editor" id="card-editor" contenteditable="true"></div>
+                <div id="file-drop-zone" style="border: 2px dashed #ddd; padding: 10px; text-align: center; margin-top: 10px;">
+                    Arrastra y suelta tus archivos aquí
+                </div>
+                <div id="attached-files"></div>
+            </div>
+
+            <div class="modal-footer">
+			<button class="save-card-btn" id="save-card-btn">GUARDAR CAMBIOS</button>
+			<button class="delete-card-btn" id="delete-card-btn" style="background-color: #ff5555; margin-right: auto">ELIMINAR</button>
+    
+		</div>
+        </div>
+    </div>
+    
+   
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
