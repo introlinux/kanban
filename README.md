@@ -1,3 +1,5 @@
+
+![Captura de pantalla del tablero Kanban](https://github.com/introlinux/kanban/blob/main/images/screenshot.jpg)
 # Tablero Kanban Personal
 
 Un tablero estilo Kanban diseñado para uso personal, que permite organizar tareas y proyectos de manera visual.
