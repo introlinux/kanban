@@ -2,12 +2,1097 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Tablero Kanban Personal</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <style>
+.editor hr {
+    border: none;
+    height: 2px;
+    background: linear-gradient(to right, #ddd, #666, #ddd);
+    margin: 20px 0;
+}
+
+.editor-toolbar button[data-command="insertHR"] {
+    font-weight: bold;
+    color: #666;
+}
+.delete-file-btn {
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0 5px;
+    margin-left: 10px;
+    border-radius: 50%;
+    line-height: 1;
+}
+
+.delete-file-btn:hover {
+    color: #ff4444;
+    background-color: rgba(255, 68, 68, 0.1);
+}
+.cover-selector h4 {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-color);
+}
+
+.image-thumbnail {
+    transition: all 0.2s;
+}
+
+.image-thumbnail:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.menu-toggle {
+    display: none; /* Ocultar por defecto en escritorio */
+}
+/* Ajuste para mejorar la experiencia en móvil */
+@media (max-width: 768px) {
+    .cover-selector {
+        padding: 10px 0;
+        border-top: 1px solid #eee;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .image-thumbnail {
+        width: 60px !important;
+        height: 60px !important;
+    }
+}
+@media (max-width: 768px) {
+    .card {
+        position: relative;
+    }
+    
+    .card:after {
+        content: "✎";
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        font-size: 12px;
+        color: #999;
+    }
+}
+        :root {
+            --primary-color: #026aa7;
+            --secondary-color: #0079bf;
+            --list-bg: #ebecf0;
+            --card-bg: #fff;
+            --text-color: #172b4d;
+            --button-color: #0079bf;
+            --button-hover: #026aa7;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 22px;
+        }
+        
+        .btn {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        
+        .btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .board-container {
+            display: flex;
+            align-items: flex-start;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            min-height: calc(100vh - 100px);
+        }
+        
+        .list {
+    flex: 0 0 auto;
+    width: 280px;
+    background-color: var(--list-bg);
+    border-radius: 10px; /* Aumentar redondez */
+    margin-right: 10px;
+    padding: 10px;
+    max-height: calc(100vh - 120px);
+    display: flex;
+    flex-direction: column;
+}
+        
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .list-title {
+            font-weight: bold;
+            font-size: 16px;
+            padding: 5px;
+            flex-grow: 1;
+        }
+        
+        .list-title:focus {
+            background-color: white;
+            outline: 2px solid var(--primary-color);
+            border-radius: 10px;
+        }
+        
+        .card-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    min-height: 10px;
+    padding-right: 6px; /* Añadir padding para la barra de desplazamiento */
+    margin-right: -6px; /* Compensar el padding */
+}
+
+/* Estilos para Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #d4d4d4 #f1f1f1;
+}
+
+
+/* Estilizar la barra de desplazamiento */
+.card-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.card-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.card-list::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+}
+
+.card-list::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+        
+        .card {
+        position: relative;
+        background-color: var(--card-bg);
+        border-radius: 10px; /* Aumentar redondez */
+        box-shadow: 0 1px 0 rgba(9, 30, 66, 0.25);
+        padding: 0;
+        margin-bottom: 8px;
+        cursor: pointer;
+        overflow: hidden;
+        transition: transform 0.1s;
+    }
+
+    .card:hover {
+        background-color: #f5f5f5;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 4px rgba(9, 30, 66, 0.15);
+    }
+
+    .card-preview {
+        display: block;
+    }
+
+    .card-title {
+        font-weight: 500;
+        font-size: 14px;
+        line-height: 1.3;
+        margin-bottom: 5px;
+    }
+
+    .card-preview img {
+        max-width: 100%;
+        max-height: 250px;
+        margin-top: 0;
+        border-top-left-radius: 10px; /* Solo redondear esquinas superiores */
+        border-top-right-radius: 10px; /* Solo redondear esquinas superiores */
+        border-bottom-left-radius: 0; /* Esquinas inferiores rectas */
+        border-bottom-right-radius: 0; /* Esquinas inferiores rectas */
+        object-fit: cover;
+    }
+
+    .card-content {
+        display: none;
+    }
+
+    .add-card, .add-list {
+        background-color: rgba(0, 0, 0, 0.05);
+        color: #172b4d;
+        border-radius: 10px;
+        padding: 8px;
+        cursor: pointer;
+        margin-top: 10px;
+        text-align: center;
+        transition: background-color 0.2s;
+    }
+
+    .add-card:hover, .add-list:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .add-list {
+        width: 280px;
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background-color: white;
+        width: 80%;
+        max-width: 600px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .modal-header {
+    padding: 15px;
+    border-bottom: none; /* Eliminamos el borde inferior para unificar visualmente con la barra */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    position: sticky;
+    top: 0;
+    z-index: 101;
+        }
+        
+        .card-title-input {
+            width: 100%;
+    padding: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin-bottom: 0; /* Eliminamos el margen inferior */
+        }
+        
+        .modal-body {
+    padding: 0;
+    overflow-y: auto;
+    flex-grow: 1;
+        }
+        
+        .modal-footer {
+            padding: 15px;
+            border-top: 1px solid #eee;
+            text-align: right;
+        }
+        
+        .close {
+            font-size: 24px;
+            cursor: pointer;
+            color: #777;
+        }
+        
+        .editor {
+    margin: 15px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    padding: 10px;
+    transition: all 0.2s ease;
+}
+
+.editor.edit-mode {
+    border-color: #ddd;
+    background-color: #fff;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    min-height: 150px;
+}
+        
+     .editor-toolbar {
+    position: sticky;
+    top: 0px; /* Ajustamos la posición para que coincida con la parte inferior del título */
+    background-color: #f5f5f5;
+    padding: 5px;
+    border-radius: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    z-index: 100;
+    margin-top: 0;
+    border-top: 1px solid #eee; /* Añadimos un borde superior para separar visualmente */
+}
+.modal-header, .editor-toolbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.edit-card-btn {
+    background-color: #0079bf;
+    color: white;
+    padding: 5px 15px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-right: 10px;
+}
+
+.edit-card-btn:hover {
+    background-color: #026aa7;
+}
+        
+        .editor-toolbar button {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 4px;
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px; /* Ajustar tamaño para los emojis */
+        }
+        .editor-toolbar button:hover {
+    background-color: #f0f0f0;
+}
+/* Mantener el tamaño normal para B, I, U */
+.editor-toolbar button[data-command="bold"],
+.editor-toolbar button[data-command="italic"],
+.editor-toolbar button[data-command="underline"] {
+    font-weight: bold;
+    font-size: 14px;
+}
+        
+        .editor-toolbar button:hover {
+            background-color: #eee;
+        }
+        
+        .save-card-btn {
+            background-color: var(--button-color);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .save-card-btn:hover {
+            background-color: var(--button-hover);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .list {
+                width: 250px;
+            }
+            
+            .modal-content {
+                width: 95%;
+            }
+        }
+    .card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 1px 10px rgba(0,0,0,0.12);
+        margin-bottom: 8px;
+        min-height: 20px;
+        position: relative;
+        cursor: pointer;
+        transition: box-shadow 0.2s ease-in-out;
+    }
+
+    .card:hover {
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .card-preview {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .preview-content {
+        color: #666;
+        font-size: 0.9em;
+        line-height: 1.5;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        padding: 12px 15px;
+        background-color: white;
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+        min-height: 50px;
+        white-space: pre-wrap; /* Cambiado de pre-line a pre-wrap */
+    }
+
+    .card-header {
+        border-bottom: 1px solid #eee;
+    }
+
+    .card-title {
+        font-weight: 500;
+        color: #333;
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+.modal-header {
+    padding: 15px 15px 10px 15px;
+    border-bottom: none;
+}
+
+.preview-thumbnail {
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.modal-header-content {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    gap: 15px;
+}
+.editor img {
+    max-width: 100%;
+    height: auto;
+    margin: 10px 0;
+    cursor: pointer;
+}
+
+/* Añadir nuevo estilo para imágenes redimensionables */
+.editor.edit-mode .image-container {
+    display: inline-block;
+    position: relative;
+    resize: both;
+    overflow: auto;
+    min-width: 50px;
+    max-width: 100%;
+    padding: 5px;
+    border: 1px solid transparent;
+    aspect-ratio: auto; /* Mantiene la proporción original de la imagen */
+}
+
+.editor.edit-mode .image-container:hover {
+    border: 1px dashed #1890ff;
+}
+
+.editor.edit-mode .image-container:active {
+    border: 1px solid #1890ff;
+}
+
+.editor.edit-mode .image-container img {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    display: block;
+    object-fit: contain; /* Asegura que la imagen mantiene sus proporciones */
+}
+
+.file-reference {
+    display: inline-block; /* Cambiado de block a inline-block */
+    padding: 6px 10px;    /* Reducido el padding vertical */
+    margin: 2px 4px;      /* Reducido el margen y añadido margen horizontal */
+    background: #f5f5f5;
+    border-radius: 5px;
+    color: #0079bf;
+    text-decoration: none;
+    white-space: nowrap;  /* Evita que el texto se rompa en varias líneas */
+}
+
+/* Estilo específico para los enlaces en la zona de archivos adjuntos */
+#attached-files .file-reference {
+    display: block;       /* Mantiene el comportamiento de bloque en la zona de adjuntos */
+    padding: 10px;        /* Mantiene el padding original */
+    margin: 5px 0;       /* Mantiene el margen original */
+}
+
+.file-reference:hover {
+    background: #e5e5e5;
+}
+.card-footer .card-title {
+    font-weight: 500;
+    color: #333;
+    flex: 1;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Permitir 2 líneas */
+    -webkit-box-orient: vertical;
+    white-space: normal; /* Permitir saltos de línea */
+    line-height: 1.3;
+    max-height: 2.6em; /* 2 líneas x 1.3 line-height */
+    margin: 5px 0;
+}
+
+/* Ajustar el padding del footer para acomodar las dos líneas */
+.card-footer {
+    padding: 10px;
+    min-height: 60px; /* Dar espacio suficiente para dos líneas + padding */
+    display: flex;
+    align-items: flex-start; /* Alinear al inicio para mejor distribución del espacio */
+}
+/* Estilo para tarjetas sin imagen */
+.card .card-header {
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+    background: linear-gradient(to bottom, #fafbfc, #f4f5f7);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.preview-content {
+    color: #666;
+    font-size: 0.9em;
+    line-height: 1.5;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    padding: 12px 15px;
+    background-color: white;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    min-height: 50px;
+    white-space: pre-line;
+}
+
+.card-title {
+    font-weight: 600;
+    color: #172b4d;
+    font-size: 14px;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Mejora para mostrar un indicador de contenido */
+.preview-content::before {
+    content: '';
+    display: block;
+    width: 30px;
+    height: 3px;
+    background-color: #dfe1e6;
+    margin-bottom: 8px;
+    border-radius: 3px;
+}
+
+/* Añadir sombra sutil a las tarjetas */
+.card {
+    box-shadow: 0 1px 2px rgba(9, 30, 66, 0.25);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(9, 30, 66, 0.15);
+}
+
+/* Añadir estos estilos en la sección de CSS */
+.editor ul, .editor ol {
+    padding-left: 25px; /* Indentación para las listas */
+    margin: 10px 0; /* Margen vertical para separar las listas del contenido */
+}
+
+.editor li {
+    margin: 5px 0; /* Espacio entre elementos de la lista */
+}
+
+/* Ajustar el estilo de las viñetas en la vista previa */
+.preview-content ul {
+    padding-left: 20px;
+    list-style-position: outside;
+}
+
+.preview-content ol {
+    padding-left: 20px;
+    list-style-position: outside;
+}
+.search-container {
+    margin-bottom: 0px;
+    position: relative;
+}
+
+#searchInput {
+    width: 200px;
+    padding: 8px 12px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+#searchInput::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+#searchInput:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+    margin-top: 5px;
+}
+
+.search-result-item {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+}
+
+.search-result-item:hover {
+    background-color: #f5f5f5;
+}
+
+.search-result-item h4 {
+    margin: 0 0 5px 0;
+    font-size: 14px;
+    color: #172b4d;
+}
+
+.search-result-item p {
+    margin: 0;
+    font-size: 12px;
+    color: #666;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.search-result-list {
+    font-size: 12px;
+    color: #0079bf;
+    margin-top: 3px;
+}
+
+/* Añadir/modificar estos estilos en la sección CSS */
+
+/* Estilos base para móvil */
+@media (max-width: 768px) {
+    /* Header responsivo */
+    header {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
+    }
+
+    header > div {
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+    }
+
+    /* Barra de búsqueda */
+    .search-container {
+        width: 100%;
+    }
+
+    #searchInput {
+        width: 100%;
+    }
+
+    /* Ajustes para el tablero */
+    .board-container {
+        flex-direction: row;
+        align-items: flex-start;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 10px 0;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x mandatory;
+        height: calc(100vh - 150px);
+    }
+
+    .list {
+        width: 85vw;
+        max-width: 350px;
+        margin-right: 10px;
+        flex-shrink: 0;
+        height: 100%;
+        scroll-snap-align: center;
+        scroll-snap-stop: always;
+    }
+
+    .card-list {
+        max-height: calc(100vh - 220px);
+        overflow-y: auto;
+    }
+
+    .add-list {
+        width: 85vw;
+        max-width: 350px;
+        flex-shrink: 0;
+    }
+
+    /* Indicador visual de scroll horizontal */
+    .board-container::after {
+        content: '';
+        flex: 0 0 10px;
+    }
+
+    /* Mejorar interacción táctil */
+    .card {
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    .card:active {
+        transform: scale(0.98);
+    }
+
+    /* Botones más grandes para mejor toque */
+    .btn, .save-card-btn, .delete-card-btn {
+        padding: 12px 20px;
+        margin: 5px;
+        min-height: 44px; /* Mínimo recomendado para elementos táctiles */
+    }
+
+    /* Mejor visualización de archivos adjuntos */
+    .file-reference {
+        padding: 10px;
+        margin: 5px 0;
+    }
+}
+
+/* Mejoras adicionales para pantallas muy pequeñas */
+@media (max-width: 480px) {
+    body {
+        padding: 10px 5px;
+    }
+
+    .modal-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .modal-header-content {
+        width: 100%;
+    }
+
+    .preview-thumbnail {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+/* Modificar los estilos para móvil */
+@media (max-width: 768px) {
+    /* Header responsivo */
+    header {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
+    }
+
+    header > div {
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+    }
+
+    /* Mantener el scroll horizontal para las listas */
+    .board-container {
+        flex-direction: row; /* Mantener dirección horizontal */
+        align-items: flex-start;
+        overflow-x: auto; /* Mantener scroll horizontal */
+        overflow-y: hidden; /* Evitar scroll vertical en el contenedor */
+        padding: 10px 0;
+        -webkit-overflow-scrolling: touch; /* Mejor scroll en iOS */
+        scroll-snap-type: x mandatory; /* Opcional: para mejor navegación */
+        height: calc(100vh - 150px); /* Altura fija restando el header */
+    }
+
+    .list {
+        width: 85vw; /* Ancho relativo a la ventana */
+        max-width: 350px; /* Máximo ancho para tablets */
+        margin-right: 10px;
+        flex-shrink: 0; /* Evita que las listas se compriman */
+        max-height: 100%; /* Altura máxima del contenedor */
+        scroll-snap-align: start; /* Opcional: para mejor navegación */
+    }
+
+    .card-list {
+        max-height: calc(100vh - 220px); /* Ajustar altura para scroll vertical */
+        overflow-y: auto;
+    }
+
+    .add-list {
+        width: 85vw;
+        max-width: 350px;
+        flex-shrink: 0;
+    }
+
+    /* Indicador visual de scroll horizontal */
+    .board-container::after {
+        content: '';
+        flex: 0 0 10px; /* Espacio al final para indicar más contenido */
+    }
+}
+@media (max-width: 768px) {
+    .board-container {
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-x pan-y; /* Permitir desplazamiento en ambas direcciones */
+        overscroll-behavior-x: contain; /* Mejorar el comportamiento del scroll */
+    }
+
+    .card {
+        touch-action: pan-y pan-x; /* Permitir desplazamiento en ambas direcciones */
+        -webkit-tap-highlight-color: transparent; /* Eliminar highlight al tocar */
+        pointer-events: auto; /* Asegurar que los eventos táctiles se propagan */
+    }
+
+    .list {
+        touch-action: pan-y pan-x; /* Permitir desplazamiento en ambas direcciones */
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .card-list {
+        touch-action: pan-y pan-x; /* Permitir desplazamiento en ambas direcciones */
+        -webkit-overflow-scrolling: touch;
+    }
+}
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        padding: 10px;
+        position: relative;
+    }
+
+    header h1 {
+        font-size: 18px;
+        margin-bottom: 5px;
+    }
+
+    header > div {
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .header-actions {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 10px;
+        background: var(--primary-color);
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        z-index: 1000;
+    }
+
+    .header-actions.show {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .menu-toggle {
+        display: block;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 20px;
+        padding: 5px;
+        cursor: pointer;
+    }
+
+    #searchInput {
+        width: calc(100% - 40px); /* Dejar espacio para el botón de menú */
+    }
+
+    /* Ajustar altura del contenedor principal */
+    .board-container {
+        height: calc(100vh - 100px); /* Reducir el espacio que ocupa el header */
+    }
+}
+/* Ajuste para mejorar la experiencia en móvil */
+@media (max-width: 768px) {
+    header > div {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .search-container {
+        position: relative;
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+    }
+
+    #searchInput {
+        width: 100%;
+    }
+
+    .menu-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        width: 38px;
+        height: 38px;
+        border-radius: 20px;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 0;
+        margin-left: 10px;
+    }
+
+    .menu-toggle:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .header-actions {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: var(--primary-color);
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        z-index: 1000;
+        margin-top: 5px;
+    }
+
+    .header-actions.show {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+}
+/* Añadir estos estilos en la sección de CSS para el header */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        padding: 10px;
+        gap: 10px;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .menu-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        width: 38px;
+        height: 38px;
+        border-radius: 20px;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 0;
+    }
+
+    .menu-toggle:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    h1 {
+        margin: 0;
+        flex-grow: 1;
+    }
+
+    .search-container {
+        width: 100%;
+    }
+
+    #searchInput {
+        width: 100%;
+    }
+
+    .header-actions {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 10px;
+        background: var(--primary-color);
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        z-index: 1000;
+    }
+
+    .header-actions.show {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+}
+
+
+    </style>
 </head>
 <body>
-       <header>
+    <header>
         <div class="header-left">
             <button class="menu-toggle">⋮</button>
             <h1 id="board-title" contenteditable="true">Mi Tablero Kanban Personal</h1>
@@ -49,15 +1134,16 @@
 </div>
             <div class="modal-body">
 
-                    <div class="editor-toolbar" style="top: 0; margin-top: 0; position: sticky; border-top: none;">
-                    <button data-command="bold">B</button>
-                    <button data-command="italic">I</button>
-                    <button data-command="underline">U</button>
-                    <button data-command="insertOrderedList">Lista numerada</button>
-                    <button data-command="insertUnorderedList">Lista con viñetas</button>
-                    <button data-command="createLink">Enlace</button>
-                    <button data-command="insertImage">Imagen</button>
-                    <button data-command="insertYoutube">YouTube</button>
+                <div class="editor-toolbar">
+                    <button data-command="bold" title="Negrita">B</button>
+                    <button data-command="italic" title="Cursiva">I</button>
+                    <button data-command="underline" title="Subrayado">U</button>
+                    <button data-command="insertOrderedList" title="Lista numerada">1.</button>
+                    <button data-command="insertUnorderedList" title="Lista con viñetas">•</button>
+                    <button data-command="createLink" title="Insertar enlace">🌐</button>
+                    <button data-command="insertImage" title="Insertar imagen">🏜️</button>
+                    <button data-command="insertYoutube" title="Insertar video">🎬</button>
+                    <button data-command="insertHR" title="Insertar línea horizontal">──</button>
                 </div>
                 <div class="editor" id="card-editor" contenteditable="true"></div>
                 <div id="file-drop-zone" style="border: 2px dashed #ddd; padding: 10px; text-align: center; margin-top: 10px;">
@@ -74,8 +1160,1380 @@
         </div>
     </div>
     
-   
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
-    <script src="js/app.js"></script>
+    <script src="js/Sortable.min.js"></script>
+    <script>
+        // Almacenamiento para los datos del tablero
+        let boardData = {
+            title: 'Mi Tablero Kanban Personal',
+            lists: []
+        };
+        
+        // Elementos DOM
+        const board = document.getElementById('board');
+        const addListBtn = document.getElementById('add-list');
+        const saveBtn = document.getElementById('save-btn');
+        const exportBtn = document.getElementById('export-btn');
+        const importBtn = document.getElementById('import-btn');
+        const cardModal = document.getElementById('card-modal');
+        const closeModal = document.querySelector('.close');
+        const cardTitleInput = document.getElementById('card-title-input');
+        const cardEditor = document.getElementById('card-editor');
+        const saveCardBtn = document.getElementById('save-card-btn');
+        const boardTitle = document.getElementById('board-title');
+        const fileDropZone = document.getElementById('file-drop-zone');
+        const attachedFilesContainer = document.getElementById('attached-files');
+        
+        // Variables para seguimiento
+        let currentCard = null;
+        let currentList = null;
+        let currentCardIndex = null;
+        let currentSelection = null;
+        let isDragging = false;
+        let lastDragTime = 0;
+        let filesToDelete = [];
+        // Al perder el foco, actualizamos y guardamos el nuevo título
+        boardTitle.addEventListener('blur', () => {
+    const newTitle = boardTitle.textContent.trim();
+    if (newTitle) {
+        boardData.title = newTitle;
+        saveBoardData(); // Guardar los cambios en localStorage
+        console.log('Título actualizado:', boardData.title);
+    } else {
+        // Si el título está vacío, restaurar el título anterior
+        boardTitle.textContent = boardData.title || 'Mi Tablero Kanban Personal';
+    }
+});
+        
+        // Modificar la función init para que sea async
+async function init() {
+    await loadBoardData();
+    renderBoardTitle();
+    setupEventListeners();
+    setupTouchEvents();
+    
+    // Comprobar si hay una tarjeta específica en la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const cardId = urlParams.get('card');
+    
+    if (cardId) {
+        // Buscar la tarjeta en todas las listas
+        let found = false;
+        boardData.lists.forEach((list, listIndex) => {
+            list.cards.forEach((card, cardIndex) => {
+                if (card.id === cardId) {
+                    currentCard = card;
+                    currentList = listIndex;
+                    currentCardIndex = cardIndex;
+                    setTimeout(() => openCardModal(card), 100);
+                    found = true;
+                }
+            });
+        });
+        
+        if (!found) {
+            console.log('Tarjeta no encontrada');
+        }
+    }
+}
+        
+        // Cargar el título desde los datos del tablero al renderizar
+        function renderBoardTitle() {
+            boardTitle.textContent = boardData.title || 'Mi Tablero Kanban Personal';
+        }
+        
+        // Modificar la función loadBoardData para que devuelva una promesa
+        function loadBoardData() {
+    return new Promise((resolve) => {
+        // Siempre intentar cargar primero desde el archivo
+        fetch('kanban-data.json?' + new Date().getTime()) // Añadir timestamp para evitar caché
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Archivo kanban-data.json no encontrado');
+                }
+                return response.json();
+            })
+            .then(data => {
+                boardData = data;
+                // Actualizar también localStorage con los datos del archivo
+                localStorage.setItem('kanbanBoard', JSON.stringify(data));
+                renderBoard();
+                console.log('Datos cargados desde kanban-data.json');
+                resolve();
+            })
+            .catch(error => {
+                console.log('No se pudo cargar kanban-data.json:', error.message);
+                
+                // Solo usar localStorage si no se encontró el archivo
+                const savedData = localStorage.getItem('kanbanBoard');
+                if (savedData) {
+                    boardData = JSON.parse(savedData);
+                    console.log('Datos cargados desde localStorage');
+                } else {
+                    console.log('No hay datos guardados, usando tablero por defecto');
+                    boardData = {
+                        title: 'Mi Tablero Kanban Personal',
+                        lists: [
+                            { title: 'Por hacer', cards: [] },
+                            { title: 'En progreso', cards: [] },
+                            { title: 'Completado', cards: [] }
+                        ]
+                    };
+                }
+                renderBoard();
+                resolve();
+            });
+    });
+}
+        
+        // Manejar archivos arrastrados
+        fileDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileDropZone.style.backgroundColor = '#f0f0f0'; // Cambiar estilo al arrastrar
+        });
+
+        fileDropZone.addEventListener('dragleave', () => {
+            fileDropZone.style.backgroundColor = ''; // Restaurar estilo al salir
+        });
+
+        fileDropZone.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    fileDropZone.style.backgroundColor = '';
+
+    const files = e.dataTransfer.files;
+    for (let file of files) {
+        if (file.type.startsWith('image/')) {
+            // Crear elemento contenedor para la imagen
+            const imgContainer = document.createElement('div');
+            imgContainer.className = 'image-container';
+            
+            // Crear la referencia a la imagen usando ruta relativa
+            const imgReference = document.createElement('img');
+            imgReference.src = `images/${file.name}`; // Ruta relativa
+            imgReference.alt = file.name;
+            imgReference.style.maxWidth = '100%';
+            imgReference.style.height = 'auto';
+            
+            imgContainer.appendChild(imgReference);
+
+            // Insertar en la posición del cursor o al final
+            if (currentSelection) {
+                currentSelection.insertNode(imgContainer);
+                currentSelection.collapse(false);
+            } else {
+                cardEditor.appendChild(imgContainer);
+            }
+
+            // Registrar el archivo adjunto en images/
+            if (!currentCard.attachedFiles) {
+                currentCard.attachedFiles = [];
+            }
+            if (!currentCard.attachedFiles.includes(`images/${file.name}`)) {
+                currentCard.attachedFiles.push(`images/${file.name}`);
+            }
+        } else if (file.type !== 'image/') { // Añadida esta condición para evitar procesar imágenes dos veces
+            // Manejar otros tipos de archivos
+            const fileReference = document.createElement('a');
+            fileReference.href = `files/${file.name}`;
+            fileReference.className = 'file-reference';
+            fileReference.innerHTML = `📎 ${file.name}`;
+            fileReference.target = '_blank';
+
+            if (currentSelection) {
+                currentSelection.insertNode(fileReference);
+                currentSelection.collapse(false);
+            } else {
+                cardEditor.appendChild(fileReference);
+            }
+
+            // Registrar el archivo adjunto en files/
+            if (!currentCard.attachedFiles) {
+                currentCard.attachedFiles = [];
+            }
+            if (!currentCard.attachedFiles.includes(`files/${file.name}`)) {
+                currentCard.attachedFiles.push(`files/${file.name}`);
+            }
+        }
+    }
+});
+        
+        // Guardar datos del tablero en localStorage
+        function saveBoardData() {
+            localStorage.setItem('kanbanBoard', JSON.stringify(boardData));
+            // Guardado silencioso sin alert
+            console.log('Tablero guardado en localStorage');
+        }
+        
+        // Capturar la selección actual en el editor para insertar contenido
+        cardEditor.addEventListener('click', () => {
+            if (window.getSelection().rangeCount > 0) {
+                currentSelection = document.getSelection().getRangeAt(0);
+            }
+        });
+
+        cardEditor.addEventListener('keyup', () => {
+            if (window.getSelection().rangeCount > 0) {
+                currentSelection = document.getSelection().getRangeAt(0);
+            }
+        });
+        
+        // Renderizar el tablero completo
+        function renderBoard() {
+            // Limpiar el tablero (excepto el botón de añadir lista)
+            const lists = document.querySelectorAll('.list');
+            lists.forEach(list => list.remove());
+            
+            // Añadir cada lista
+            boardData.lists.forEach((listData, listIndex) => {
+                const list = createListElement(listData, listIndex);
+                board.insertBefore(list, addListBtn);
+                
+                // Inicializar Sortable para las tarjetas dentro de la lista
+                const cardList = list.querySelector('.card-list');
+                initSortable(cardList, listIndex);
+                
+                // Añadir cada tarjeta a la lista
+                listData.cards.forEach((cardData, cardIndex) => {
+                    const card = createCardElement(cardData, listIndex, cardIndex);
+                    cardList.appendChild(card);
+                });
+            });
+            
+            // Hacer que las listas sean ordenables
+            initBoardSortable();
+        }
+        
+        // Crear elemento de lista
+        function createListElement(listData, listIndex) {
+            const list = document.createElement('div');
+            list.className = 'list';
+            list.innerHTML = `
+                <div class="list-header">
+                    <div class="list-title" contenteditable="true">${listData.title}</div>
+                    <div class="list-actions">
+						<span class="delete-list" data-list-index="${listIndex}">×</span>				
+                    </div>
+                </div>
+                <div class="card-list" data-list-index="${listIndex}"></div>
+                <div class="add-card" data-list-index="${listIndex}">+ Añadir Tarjeta</div>
+            `;
+            
+            // Evento para editar el título de la lista
+            const listTitle = list.querySelector('.list-title');
+            listTitle.addEventListener('blur', () => {
+                boardData.lists[listIndex].title = listTitle.textContent;
+                saveBoardData(); // Guardar automáticamente al editar
+            });
+            
+            // Evento para eliminar lista
+            const deleteList = list.querySelector('.delete-list');
+            deleteList.addEventListener('click', () => {
+                if (confirm('¿Estás seguro de que quieres eliminar esta lista y todas sus tarjetas?')) {
+                    boardData.lists.splice(listIndex, 1);
+                    renderBoard();
+                    saveBoardData(); // Guardar después de eliminar
+                }
+            });
+            
+            // Evento para añadir tarjeta
+            const addCard = list.querySelector('.add-card');
+addCard.addEventListener('click', () => {
+    const newCard = {
+        title: 'Nueva tarjeta',
+        content: '',
+        previewImage: ''
+    };
+    boardData.lists[listIndex].cards.push(newCard);
+    
+    const cardList = list.querySelector('.card-list');
+    const card = createCardElement(newCard, listIndex, boardData.lists[listIndex].cards.length - 1);
+    cardList.appendChild(card);
+    
+    // Abrir modal para editar la nueva tarjeta
+    currentCard = newCard;
+    currentList = listIndex;
+    currentCardIndex = boardData.lists[listIndex].cards.length - 1;
+    openCardModal(newCard);
+    // Cambiar inmediatamente a modo edición
+    setTimeout(() => {
+        setEditMode();
+    }, 50);
+});
+            
+            return list;
+        }
+        
+        // Extraer la primera imagen del contenido HTML
+        function extractFirstImage(htmlContent) {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlContent;
+    const firstImg = tempDiv.querySelector('img');
+    if (firstImg) {
+        // Convertir a ruta relativa si es necesario
+        let imgSrc = firstImg.src;
+        if (imgSrc.startsWith('file://')) {
+            // Extraer solo el nombre del archivo de la ruta completa
+            imgSrc = 'images/' + imgSrc.split('/').pop();
+        }
+        return imgSrc;
+    }
+    return null;
+}
+        
+        // Crear elemento de tarjeta
+function createCardElement(cardData, listIndex, cardIndex) {
+    // Asegurarnos de que cada tarjeta tiene un ID único
+    if (!cardData.id) {
+        cardData.id = 'card_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+    
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.setAttribute('data-list-index', listIndex);
+    card.setAttribute('data-card-index', cardIndex);
+    card.setAttribute('data-card-id', cardData.id);
+    
+    // Crear la vista previa de la tarjeta
+    const cardPreview = document.createElement('div');
+    cardPreview.className = 'card-preview';
+    
+    // Diseño diferente dependiendo de si tiene imagen de portada o no
+    if (cardData.previewImage) {
+        // Con imagen: imagen arriba, título abajo
+        
+        // 1. Primero la imagen a ancho completo y sin margen
+        const imgContainer = document.createElement('div');
+        imgContainer.style.width = '100%';
+        imgContainer.style.overflow = 'hidden';
+        imgContainer.style.borderTopLeftRadius = '10px';
+        imgContainer.style.borderTopRightRadius = '10px';
+        
+        const imgElement = document.createElement('img');
+        imgElement.src = cardData.previewImage;
+        imgElement.alt = cardData.title;
+        imgElement.style.width = '100%';
+        imgElement.style.display = 'block';
+        imgElement.style.borderTopLeftRadius = '10px';
+        imgElement.style.borderTopRightRadius = '10px';
+        
+        imgContainer.appendChild(imgElement);
+        cardPreview.appendChild(imgContainer);
+        
+        // 2. Luego el título en la parte inferior
+        const cardFooter = document.createElement('div');
+        cardFooter.className = 'card-footer';
+        cardFooter.style.display = 'flex';
+        cardFooter.style.justifyContent = 'space-between';
+        cardFooter.style.alignItems = 'center';
+        cardFooter.style.padding = '10px';
+        
+        const titleElement = document.createElement('div');
+        titleElement.className = 'card-title';
+        titleElement.textContent = cardData.title || 'Sin título';
+        cardFooter.appendChild(titleElement);
+        
+        cardPreview.appendChild(cardFooter);
+    } else {
+        // Sin imagen: diseño original con título en la parte superior
+        const cardHeader = document.createElement('div');
+        cardHeader.className = 'card-header';
+        cardHeader.style.display = 'flex';
+        cardHeader.style.justifyContent = 'space-between';
+        cardHeader.style.alignItems = 'center';
+        cardHeader.style.padding = '15px'; // Añadir padding al header
+        
+        const titleElement = document.createElement('div');
+        titleElement.className = 'card-title';
+        titleElement.textContent = cardData.title || 'Sin título';
+        titleElement.style.margin = '10px 0'; // Añadir margen vertical al título
+        cardHeader.appendChild(titleElement);
+        
+        cardPreview.appendChild(cardHeader);
+        
+        // Añadir un contenedor para la vista previa del contenido
+        const previewContent = document.createElement('div');
+        previewContent.className = 'preview-content';
+        previewContent.style.padding = '0 15px 15px 15px';
+
+        // Extraer y procesar el contenido
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = cardData.content;
+
+        // Procesar el contenido manteniendo el formato de listas
+        let processedContent = '';
+        const textNodes = [];
+
+        // Función recursiva para extraer texto
+        function extractText(element) {
+            Array.from(element.childNodes).forEach(node => {
+                if (node.nodeType === 3) { // Nodo de texto
+                    textNodes.push(node.textContent.trim());
+                } else if (node.nodeType === 1) { // Elemento
+                    if (node.tagName === 'LI') {
+                        textNodes.push('• ' + node.textContent.trim());
+                    } else if (node.tagName === 'BR') {
+                        textNodes.push('\n');
+                    } else {
+                        extractText(node);
+                    }
+                }
+            });
+        }
+
+        extractText(tempDiv);
+        processedContent = textNodes.join(' ').replace(/\s+/g, ' ').trim();
+
+        // Limitar a 100 caracteres
+        if (processedContent.length > 100) {
+            processedContent = processedContent.substring(0, 100) + '...';
+        }
+
+        previewContent.textContent = processedContent;
+        
+        cardPreview.appendChild(previewContent);
+    }
+    
+    card.appendChild(cardPreview);
+    
+    // Contenedor oculto para el contenido completo (solo para referencia, no se muestra)
+    const cardContent = document.createElement('div');
+    cardContent.className = 'card-content';
+    cardContent.innerHTML = cardData.content;
+    card.appendChild(cardContent);
+    
+    // Eventos para manejar la activación de la tarjeta
+    let touchStartTime = 0;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let hasMoved = false;
+    let isScrolling = false;
+
+    card.addEventListener('touchstart', (e) => {
+        touchStartTime = Date.now();
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        hasMoved = false;
+        isScrolling = false;
+    }, { passive: true });
+
+    card.addEventListener('touchmove', (e) => {
+        if (!touchStartX || !touchStartY) return;
+
+        const deltaX = Math.abs(e.touches[0].clientX - touchStartX);
+        const deltaY = Math.abs(e.touches[0].clientY - touchStartY);
+        
+        // Si el movimiento es más horizontal que vertical, permitir el scroll del contenedor
+        if (deltaX > deltaY && deltaX > 5) {
+            isScrolling = true;
+            e.stopPropagation();
+        }
+        
+        if (deltaX > 5 || deltaY > 5) {
+            hasMoved = true;
+        }
+    }, { passive: true });
+
+    card.addEventListener('touchend', (e) => {
+        const touchDuration = Date.now() - touchStartTime;
+        
+        // Solo abrir la tarjeta si fue un tap (toque corto sin movimiento)
+        if (!hasMoved && touchDuration < 300 && !isScrolling) {
+            e.preventDefault();
+            currentCard = cardData;
+            currentList = listIndex;
+            currentCardIndex = cardIndex;
+            openCardModal(cardData);
+            setTimeout(setViewMode, 50);
+        }
+    });
+
+    // Solo mantener el click para dispositivos no táctiles
+    card.addEventListener('click', (e) => {
+        if (window.matchMedia('(hover: hover)').matches) {
+            const timeSinceLastDrag = Date.now() - lastDragTime;
+            if (!isDragging && timeSinceLastDrag > 300 && !e.target.classList.contains('delete-card')) {
+                currentCard = cardData;
+                currentList = listIndex;
+                currentCardIndex = cardIndex;
+                openCardModal(cardData);
+                setTimeout(setViewMode, 50);
+            }
+        }
+    });
+
+    return card;
+}
+// Abrir modal de edición de tarjeta
+// Modificar la función openCardModal para actualizar la URL
+function openCardModal(cardData) {
+    // Actualizar la URL con el ID de la tarjeta
+    if (cardData.id) {
+        const newUrl = new URL(window.location);
+        newUrl.searchParams.set('card', cardData.id);
+        window.history.pushState({}, '', newUrl);
+    }
+    
+    // Configuración básica del modal
+    const cardTitleDisplay = document.getElementById('card-title-display');
+    
+    // Configurar los elementos de visualización
+    cardTitleDisplay.textContent = cardData.title || 'Sin título';
+    cardTitleInput.value = cardData.title || '';
+    cardEditor.innerHTML = cardData.content || '';
+    
+    // Configurar modo visualización por defecto
+    setViewMode();
+
+    // Mostrar archivos adjuntos (solo archivos que no sean JPG o PNG)
+    attachedFilesContainer.innerHTML = ''; // Limpiar
+if (cardData.attachedFiles && cardData.attachedFiles.length > 0) {
+    const nonImageFiles = cardData.attachedFiles.filter(file => {
+        const lowerFile = file.toLowerCase();
+        return !lowerFile.endsWith('.jpg') && 
+               !lowerFile.endsWith('.jpeg') && 
+               !lowerFile.endsWith('.png');
+    });
+
+    if (nonImageFiles.length > 0) {
+        const header = document.createElement('h4');
+        header.textContent = 'Archivos adjuntos';
+        header.style.marginBottom = '10px';
+        attachedFilesContainer.appendChild(header);
+
+       filesToDelete = []; // Limpiar archivos pendientes de eliminar
+
+        nonImageFiles.forEach(file => {
+            const fileContainer = document.createElement('div');
+            fileContainer.style.display = 'flex';
+            fileContainer.style.justifyContent = 'space-between';
+            fileContainer.style.alignItems = 'center';
+            fileContainer.style.marginBottom = '5px';
+
+            const fileLink = document.createElement('a');
+            fileLink.href = file;
+            fileLink.className = 'file-reference';
+            fileLink.textContent = `📎 ${file.split('/').pop()}`; // Mostrar solo el nombre
+            fileLink.target = '_blank';
+            fileContainer.appendChild(fileLink);
+
+            const deleteButton = document.createElement('button');
+            deleteButton.innerHTML = '×';
+            deleteButton.className = 'delete-file-btn';
+            deleteButton.style.display = 'none'; // Inicialmente oculto
+            deleteButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (confirm('¿Estás seguro de que quieres eliminar este archivo?')) {
+            // En lugar de eliminar el archivo, lo marcamos como pendiente de eliminar
+            filesToDelete.push(file);
+            // Aplicar estilo visual para indicar que está pendiente de eliminar
+            fileContainer.style.opacity = '0.5';
+            fileContainer.style.textDecoration = 'line-through';
+            deleteButton.style.display = 'none';
+        }
+            });
+            fileContainer.appendChild(deleteButton);
+            attachedFilesContainer.appendChild(fileContainer);
+        });
+    }
+}
+
+
+    // Eliminar cualquier selector de imagen existente
+    const existingSelectors = document.querySelectorAll('.cover-selector');
+    existingSelectors.forEach(selector => selector.remove());
+
+    // Añadir selector de imagen de portada
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = cardData.content || '';
+    const images = tempDiv.querySelectorAll('img');
+    
+    if (images.length > 0) {
+        // Crear contenedor para selector de imagen (colapsado inicialmente)
+        const coverSelector = document.createElement('div');
+        coverSelector.className = 'cover-selector';
+        coverSelector.style.marginTop = '15px';
+        coverSelector.style.border = '1px solid #eee';
+        coverSelector.style.borderRadius = '4px';
+        coverSelector.style.padding = '10px';
+        
+        // Botón para mostrar/ocultar el selector
+        const toggleButton = document.createElement('button');
+        toggleButton.innerHTML = 'Seleccionar imagen de portada ▼';
+        toggleButton.style.width = '100%';
+        toggleButton.style.textAlign = 'left';
+        toggleButton.style.padding = '8px';
+        toggleButton.style.border = 'none';
+        toggleButton.style.background = '#f5f5f5';
+        toggleButton.style.borderRadius = '10px';
+        toggleButton.style.cursor = 'pointer';
+        
+        // Contenedor para las miniaturas (oculto inicialmente)
+        const thumbnailsContainer = document.createElement('div');
+        thumbnailsContainer.style.display = 'none'; // Inicialmente oculto
+        thumbnailsContainer.style.flexWrap = 'wrap';
+        thumbnailsContainer.style.gap = '10px';
+        thumbnailsContainer.style.marginTop = '10px';
+        
+        // Mostrar/ocultar al hacer clic en el botón
+        toggleButton.addEventListener('click', () => {
+            const isVisible = thumbnailsContainer.style.display === 'flex';
+            thumbnailsContainer.style.display = isVisible ? 'none' : 'flex';
+            toggleButton.innerHTML = `Seleccionar imagen de portada ${isVisible ? '▼' : '▲'}`;
+        });
+        
+        // Añadir opción para no usar imagen de portada
+        const noImageOption = document.createElement('div');
+        noImageOption.innerHTML = 'Sin imagen';
+        noImageOption.style.padding = '5px';
+        noImageOption.style.border = '1px solid #ddd';
+        noImageOption.style.borderRadius = '10px';
+        noImageOption.style.cursor = 'pointer';
+        noImageOption.style.textAlign = 'center';
+        
+        if (!cardData.previewImage) {
+            noImageOption.style.backgroundColor = '#e6f7ff';
+            noImageOption.style.borderColor = '#1890ff';
+        }
+        
+        noImageOption.addEventListener('click', () => {
+            // Desmarcar todas las miniaturas
+            thumbnailsContainer.querySelectorAll('.image-thumbnail').forEach(thumbnail => {
+                thumbnail.style.borderColor = '#ddd';
+                thumbnail.style.backgroundColor = '';
+            });
+            // Marcar esta opción
+            noImageOption.style.backgroundColor = '#e6f7ff';
+            noImageOption.style.borderColor = '#1890ff';
+            // Guardar referencia a la imagen seleccionada
+            cardData.previewImage = '';
+            // Mostrar estado seleccionado en el botón de toggle
+            toggleButton.innerHTML = 'Imagen de portada: Sin imagen ▼';
+            
+            // Ocultar la miniatura en el encabezado
+            const previewThumbnail = document.getElementById('preview-thumbnail');
+            previewThumbnail.style.display = 'none';
+        });
+        
+        thumbnailsContainer.appendChild(noImageOption);
+        
+        // Agregar cada imagen como miniatura seleccionable
+        images.forEach((img, index) => {
+            const thumbnail = document.createElement('div');
+            thumbnail.className = 'image-thumbnail';
+            thumbnail.style.width = '80px';
+            thumbnail.style.height = '60px';
+            thumbnail.style.backgroundImage = `url(${img.src})`;
+            thumbnail.style.backgroundSize = 'cover';
+            thumbnail.style.backgroundPosition = 'center';
+            thumbnail.style.border = '1px solid #ddd';
+            thumbnail.style.borderRadius = '10px';
+            thumbnail.style.cursor = 'pointer';
+            
+            // Marcar la miniatura si es la imagen de portada actual
+            if (cardData.previewImage === img.src) {
+                thumbnail.style.borderColor = '#1890ff';
+                thumbnail.style.backgroundColor = '#e6f7ff';
+                thumbnail.style.borderWidth = '2px';
+                // Actualizar texto del botón para mostrar la selección actual
+                toggleButton.innerHTML = 'Imagen de portada: Seleccionada ▼';
+            }
+            
+            thumbnail.addEventListener('click', () => {
+                // Desmarcar todas las miniaturas y la opción sin imagen
+                thumbnailsContainer.querySelectorAll('.image-thumbnail').forEach(thumb => {
+                    thumb.style.borderColor = '#ddd';
+                    thumb.style.backgroundColor = '';
+                    thumb.style.borderWidth = '1px';
+                });
+                noImageOption.style.backgroundColor = '';
+                noImageOption.style.borderColor = '#ddd';
+                
+                // Marcar esta miniatura
+                thumbnail.style.borderColor = '#1890ff';
+                thumbnail.style.backgroundColor = '#e6f7ff';
+                thumbnail.style.borderWidth = '2px';
+                
+                // Guardar referencia a la imagen seleccionada
+                // Convertir a ruta relativa antes de guardar
+                const imgSrc = img.src;
+                let relativePath = imgSrc;
+                if (imgSrc.startsWith('file://')) {
+                    relativePath = 'images/' + imgSrc.split('/').pop();
+                } else if (imgSrc.includes('/images/')) {
+                    relativePath = 'images/' + imgSrc.split('/images/').pop();
+                }
+                
+                // Guardar referencia a la imagen seleccionada con ruta relativa
+                cardData.previewImage = relativePath;
+                
+                // Actualizar la miniatura en el encabezado
+                const previewThumbnail = document.getElementById('preview-thumbnail');
+                previewThumbnail.src = relativePath;
+                previewThumbnail.style.display = 'block';
+            });
+            
+            thumbnailsContainer.appendChild(thumbnail);
+        });
+        
+        coverSelector.appendChild(toggleButton);
+        coverSelector.appendChild(thumbnailsContainer);
+        
+        // Añadir al modal antes del editor
+        const modalBody = document.querySelector('.modal-body');
+        modalBody.insertBefore(coverSelector, cardEditor.previousElementSibling);
+        
+        // Actualizar el texto del botón según la selección actual
+        if (cardData.previewImage) {
+            toggleButton.innerHTML = 'Imagen de portada: Seleccionada ▼';
+        } else {
+            toggleButton.innerHTML = cardData.previewImage === '' ? 
+                'Imagen de portada: Sin imagen ▼' : 
+                'Seleccionar imagen de portada ▼';
+        }
+    }
+
+    // Manejar la miniatura
+    const previewThumbnail = document.getElementById('preview-thumbnail');
+    if (cardData.previewImage) {
+        previewThumbnail.src = cardData.previewImage;
+        previewThumbnail.style.display = 'block';
+    } else {
+        previewThumbnail.style.display = 'none';
+    }
+
+    cardModal.style.display = 'flex';
+
+    // Reemplazar el listener DOMNodeInserted con MutationObserver
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node.nodeType === 1 && node.tagName === 'A') {
+                    node.setAttribute('target', '_blank');
+                }
+            });
+        });
+    });
+
+    observer.observe(cardEditor, {
+        childList: true,
+        subtree: true
+    });
+
+       // Configurar eventos de arrastrar y soltar para el editor
+       cardEditor.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        if (cardEditor.contentEditable === "true") { // Solo si está en modo edición
+            cardEditor.style.backgroundColor = '#f0f0f0';
+        }
+    });
+
+    cardEditor.addEventListener('dragleave', () => {
+        cardEditor.style.backgroundColor = '';
+    });
+
+    cardEditor.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        cardEditor.style.backgroundColor = '';
+
+        if (cardEditor.contentEditable !== "true") return; // Solo procesar en modo edición
+
+        const files = e.dataTransfer.files;
+        const selection = window.getSelection();
+        const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+
+        for (let file of files) {
+            // Verificar si el archivo ya existe en el editor
+        const fileName = file.name;
+        const existingFile = cardEditor.querySelector(`[href$="${fileName}"], [src$="${fileName}"]`);
+        if (existingFile) {
+            console.log(`El archivo ${fileName} ya está insertado`);
+            continue; // Saltar al siguiente archivo
+        }
+            if (file.type.startsWith('image/')) {
+                // Crear elemento contenedor para la imagen
+                const imgContainer = document.createElement('div');
+                imgContainer.className = 'image-container';
+                
+                // Crear la referencia a la imagen usando ruta relativa
+                const imgReference = document.createElement('img');
+                imgReference.src = `images/${file.name}`;
+                imgReference.alt = file.name;
+                imgReference.style.maxWidth = '100%';
+                imgReference.style.height = 'auto';
+                
+                imgContainer.appendChild(imgReference);
+
+                // Añadir un salto de línea después de la imagen
+                const lineBreak = document.createElement('br');
+
+                // Insertar en la posición del cursor o al final
+                if (range) {
+                    range.insertNode(imgContainer);
+                    range.insertNode(lineBreak);
+                    range.insertNode(lineBreak);
+                    range.collapse(false);
+                } else {
+                    cardEditor.appendChild(imgContainer);
+                    cardEditor.appendChild(lineBreak);
+                    cardEditor.appendChild(lineBreak);
+                }
+
+                // Registrar el archivo adjunto
+                if (!currentCard.attachedFiles) {
+                    currentCard.attachedFiles = [];
+                }
+                if (!currentCard.attachedFiles.includes(`images/${file.name}`)) {
+                    currentCard.attachedFiles.push(`images/${file.name}`);
+                }
+            } else {
+                // Manejar otros tipos de archivos
+                const fileReference = document.createElement('a');
+                fileReference.href = `files/${file.name}`;
+                fileReference.className = 'file-reference';
+                fileReference.innerHTML = `📎 ${file.name}`;
+                fileReference.target = '_blank';
+
+                // Insertar en la posición del cursor o al final
+                if (range) {
+                    range.insertNode(fileReference);
+                    range.collapse(false);
+                } else {
+                    cardEditor.appendChild(fileReference);
+                }
+
+                // Registrar el archivo adjunto
+                if (!currentCard.attachedFiles) {
+                    currentCard.attachedFiles = [];
+                }
+                if (!currentCard.attachedFiles.includes(`files/${file.name}`)) {
+                    currentCard.attachedFiles.push(`files/${file.name}`);
+                }
+            }
+        }
+    });
+
+ 
+}
+
+// Función para cambiar al modo visualización
+function setViewMode() {
+    // Mostrar elementos de visualización
+    document.getElementById('card-title-display').style.display = 'block';
+    document.getElementById('edit-card-btn').style.display = 'block';
+    
+    // Ocultar elementos de edición
+    document.getElementById('card-title-input').style.display = 'none';
+    document.querySelector('.editor-toolbar').style.display = 'none';
+    document.getElementById('file-drop-zone').style.display = 'none';
+    document.getElementById('save-card-btn').style.display = 'none';
+    document.getElementById('delete-card-btn').style.display = 'none';
+     // Ocultar botones de eliminar archivos
+     document.querySelectorAll('.delete-file-btn').forEach(btn => {
+        btn.style.display = 'none';
+    });
+    // Hacer que el editor no sea editable y remover clase visual
+    cardEditor.contentEditable = "false";
+    cardEditor.classList.remove('edit-mode'); // Remover clase de estilo visual
+    
+    // Ocultar selector de imágenes si existe
+    const coverSelector = document.querySelector('.cover-selector');
+    if (coverSelector) coverSelector.style.display = 'none';
+    
+    // Mantener la miniatura visible si existe una imagen de portada
+    const previewThumbnail = document.getElementById('preview-thumbnail');
+    if (currentCard && currentCard.previewImage) {
+        previewThumbnail.style.display = 'block';
+    
+    }
+}
+
+// Función para cambiar al modo edición
+function setEditMode() {
+    // Ocultar elementos de visualización
+    document.getElementById('card-title-display').style.display = 'none';
+    document.getElementById('edit-card-btn').style.display = 'none';
+    
+    // Mostrar elementos de edición
+    document.getElementById('card-title-input').style.display = 'block';
+    document.querySelector('.editor-toolbar').style.display = 'flex';
+    document.getElementById('file-drop-zone').style.display = 'block';
+    document.getElementById('save-card-btn').style.display = 'block';
+    document.getElementById('delete-card-btn').style.display = 'block';
+    document.querySelectorAll('.delete-file-btn').forEach(btn => {
+        btn.style.display = 'block';
+    });
+    // Hacer que el editor sea editable y añadir clase visual
+    cardEditor.contentEditable = "true";
+    cardEditor.classList.add('edit-mode'); // Añadir clase para estilo visual
+    
+    // Mostrar selector de imágenes si existe
+    const coverSelector = document.querySelector('.cover-selector');
+    if (coverSelector) coverSelector.style.display = 'block';
+    
+    // Mantener la miniatura visible si existe una imagen de portada
+    const previewThumbnail = document.getElementById('preview-thumbnail');
+    if (currentCard && currentCard.previewImage) {
+        previewThumbnail.style.display = 'block';
+    }
+}
+
+        // Cerrar modal de edición de tarjeta
+        function closeCardModal() {
+    // Limpiar el parámetro de la URL
+    const newUrl = new URL(window.location);
+    newUrl.searchParams.delete('card');
+    window.history.pushState({}, '', newUrl);
+     // Limpiar la lista de archivos pendientes de eliminar
+     filesToDelete = [];
+    
+    cardModal.style.display = 'none';
+    currentCard = null;
+    currentList = null;
+    currentCardIndex = null;
+    // Detener cualquier video de YouTube en el editor
+    const iframes = cardEditor.querySelectorAll('iframe');
+    iframes.forEach(iframe => {
+        const src = iframe.src;
+        iframe.src = '';
+        iframe.src = src;
+    });
+
+    cardModal.style.display = 'none';
+    currentCard = null;
+    currentList = null;
+    currentCardIndex = null;
+}
+
+        // Inicializar Sortable para las tarjetas dentro de una lista
+        function initSortable(element, listIndex) {
+    new Sortable(element, {
+        group: 'cards',
+        animation: 150,
+        ghostClass: 'card-ghost',     
+        delayOnTouchOnly: true,
+        delay: 300,
+        touchStartThreshold: 5,
+        scrollSensitivity: 30,    // Distancia desde el borde para iniciar el scroll
+        scrollSpeed: 10,          // Velocidad de scroll
+        scroll: true,
+        forceAutoscrollFallback: true,
+        scrollFn: function(offsetX, offsetY, originalEvent, touchEvt, hoverTargetEl) {
+            const boardContainer = document.querySelector('.board-container');
+            if (offsetX !== 0) {
+                boardContainer.scrollLeft += offsetX;
+            }
+        },
+        onStart: function() {
+            isDragging = true;
+            //document.querySelector('.board-container').style.overflow = 'hidden';
+        },
+        onEnd: function(evt) {
+            lastDragTime = Date.now();
+            const fromListIndex = parseInt(evt.from.getAttribute('data-list-index'));
+            const toListIndex = parseInt(evt.to.getAttribute('data-list-index'));
+            const oldIndex = evt.oldIndex;
+            const newIndex = evt.newIndex;
+            
+            const movedCard = boardData.lists[fromListIndex].cards.splice(oldIndex, 1)[0];
+            boardData.lists[toListIndex].cards.splice(newIndex, 0, movedCard);
+            saveBoardData();
+            
+            setTimeout(() => {
+                isDragging = false;
+                //document.querySelector('.board-container').style.overflow = 'auto';
+            }, 300);
+        }
+    });
+}
+        
+        // Guardar contenido de tarjeta
+        function saveCardContent() {
+            if (!currentCard) return; //validación adicional
+    currentCard.title = cardTitleInput.value;
+    currentCard.content = cardEditor.innerHTML;
+     // Eliminar los archivos marcados para eliminar
+     if (filesToDelete.length > 0) {
+        if (!currentCard.attachedFiles) currentCard.attachedFiles = [];
+        currentCard.attachedFiles = currentCard.attachedFiles.filter(
+            file => !filesToDelete.includes(file)
+        );
+        // Limpiar la lista de archivos pendientes de eliminar
+    filesToDelete = [];
+    }
+    // Actualizar la vista previa de la tarjeta
+    renderBoard();
+    
+    // Guardar cambios
+    saveBoardData();
+    
+    // Cerrar modal
+    closeCardModal();
+}
+        
+        // Inicializar Sortable para las listas
+        function initBoardSortable() {
+            new Sortable(board, {
+                animation: 150,
+                ghostClass: 'list-ghost',
+                handle: '.list-header',
+                filter: '.add-list',
+                onEnd: function(evt) {
+                    // Ignorar si el elemento es el botón de añadir lista
+                    if (evt.item.classList.contains('add-list')) return;
+                    
+                    const oldIndex = evt.oldIndex;
+                    const newIndex = evt.newIndex > oldIndex && evt.item.nextElementSibling.classList.contains('add-list')
+                        ? evt.newIndex - 1 : evt.newIndex;
+                    
+                    // Reordenar las listas en los datos
+                    const movedList = boardData.lists.splice(oldIndex, 1)[0];
+                    boardData.lists.splice(newIndex, 0, movedList);
+                    saveBoardData(); // Guardar después de reordenar
+                }
+            });
+        }
+        
+        // Configurar listeners de eventos
+        function setupEventListeners() {
+// Botón para cambiar al modo edición
+const editCardBtn = document.getElementById('edit-card-btn');
+editCardBtn.addEventListener('click', () => {
+    setEditMode();
+});
+const deleteCardBtn = document.getElementById('delete-card-btn');
+deleteCardBtn.addEventListener('click', () => {
+    if (confirm('¿Estás seguro de que quieres eliminar esta tarjeta?')) {
+        boardData.lists[currentList].cards.splice(currentCardIndex, 1);
+        closeCardModal();
+        renderBoard();
+        saveBoardData();
+    }
+});
+            // Añadir nueva lista
+            addListBtn.addEventListener('click', () => {
+                const newList = {
+                    title: 'Nueva Lista',
+                    cards: []
+                };
+                boardData.lists.push(newList);
+                
+                const list = createListElement(newList, boardData.lists.length - 1);
+                board.insertBefore(list, addListBtn);
+                
+                // Inicializar Sortable para la nueva lista
+                const cardList = list.querySelector('.card-list');
+                initSortable(cardList, boardData.lists.length - 1);
+                saveBoardData(); // Guardar después de añadir lista
+            });
+            
+            // Guardar tablero
+            saveBtn.addEventListener('click', () => {
+                saveBoardData();
+                alert('Tablero guardado correctamente');
+            });
+            
+            // Modificar el evento del botón exportar
+            exportBtn.addEventListener('click', () => {
+    // Asegurarnos de que el título actual está guardado
+    boardData.title = boardTitle.textContent.trim() || 'Mi Tablero Kanban Personal';
+    
+    const dataStr = JSON.stringify(boardData, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const exportLink = document.getElementById('exportLink');
+    exportLink.href = url;
+    exportLink.download = 'kanban-data.json';
+    exportLink.click();
+    
+    setTimeout(() => {
+        URL.revokeObjectURL(url);
+    }, 100);
+});
+            
+            // Importar tablero
+            importBtn.addEventListener('click', () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                
+                input.onchange = e => {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(event) {
+                        try {
+                            const jsonData = JSON.parse(event.target.result);
+                            boardData = jsonData;
+                            renderBoard();
+                            renderBoardTitle(); // Actualizar también el título
+                            saveBoardData();
+                            alert('Tablero importado correctamente');
+                        } catch (err) {
+                            alert('Error al importar el archivo: ' + err.message);
+                        }
+                    };
+                    
+                    reader.readAsText(file);
+                };
+                
+                input.click();
+            });
+            
+            // Cerrar modal
+            closeModal.addEventListener('click', closeCardModal);
+            window.addEventListener('click', (e) => {
+                if (e.target === cardModal) {
+                    closeCardModal();
+                }
+            });
+            
+            // Guardar contenido de tarjeta
+            saveCardBtn.addEventListener('click', saveCardContent);
+            
+            // Botones de la barra de herramientas del editor
+            document.querySelectorAll('.editor-toolbar button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const command = button.getAttribute('data-command');
+                    
+                    if (command === 'createLink') {
+    const url = prompt('Introduce la URL del enlace:');
+    if (url) {
+        let formattedUrl = url;
+        if (!/^https?:\/\//i.test(url)) {
+            formattedUrl = 'http://' + url;
+        }
+        
+        // Obtener el texto seleccionado
+        const selectedText = window.getSelection().toString() || 'Enlace';
+        
+        // Comprobar si es un enlace de YouTube
+        if (formattedUrl.toLowerCase().includes('youtu')) {
+            const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+            if (match && match[1]) {
+                const videoId = match[1];
+                document.execCommand('insertHTML', false, 
+                    `<a href="https://www.youtube.com/watch?v=${videoId}" 
+                    class="file-reference" target="_blank">
+                    🎬 ${selectedText}</a>`);
+            } else {
+                document.execCommand('insertHTML', false, 
+                    `<a href="${formattedUrl}" 
+                    class="file-reference" target="_blank">
+                    🌐 ${selectedText}</a>`);
+            }
+        } else {
+            // Enlaces normales con icono de web
+            document.execCommand('insertHTML', false, 
+                `<a href="${formattedUrl}" 
+                class="file-reference" target="_blank">
+                🌐 ${selectedText}</a>`);
+        }
+    }
+}
+                    else if (command === 'insertImage') {
+                        const url = prompt('Introduce la URL de la imagen:');
+                        if (url) document.execCommand('insertHTML', false, `<img src="${url}" alt="Imagen">`);
+                    }
+                    else if (command === 'insertYoutube') {
+                        const url = prompt('Introduce la URL del video de YouTube:');
+                        if (url) {
+                            // Extraer ID del video de YouTube
+                            let videoId = '';
+                            const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+                            if (match && match[1]) {
+                                videoId = match[1];
+                                document.execCommand('insertHTML', false, 
+                                    `<iframe width="100%" height="200" src="https://www.youtube.com/embed/${videoId}" 
+                                    frameborder="0" allowfullscreen></iframe>`);
+                            } else {
+                                alert('URL de YouTube inválida');
+                            }
+                        }
+                    }
+                    else if (command === 'insertHR') {
+                       document.execCommand('insertHTML', false, '<hr>');
+                    }
+                    else {
+                        document.execCommand(command, false, null);
+                    }
+                    
+                    cardEditor.focus();
+                });
+            });
+// Añadir al final de setupEventListeners()
+const searchInput = document.getElementById('searchInput');
+const searchResults = document.getElementById('searchResults');
+
+searchInput.addEventListener('input', debounce(() => {
+    const searchTerm = searchInput.value.toLowerCase();
+    
+    if (searchTerm.length < 2) {
+        searchResults.style.display = 'none';
+        return;
+    }
+
+    const results = [];
+    boardData.lists.forEach((list, listIndex) => {
+        list.cards.forEach((card, cardIndex) => {
+            if (card.title.toLowerCase().includes(searchTerm) || 
+                stripHtml(card.content).toLowerCase().includes(searchTerm)) {
+                results.push({
+                    card,
+                    listIndex,
+                    cardIndex,
+                    listName: list.title
+                });
+            }
+        });
+    });
+
+    renderSearchResults(results);
+}, 300));
+
+// Función para eliminar HTML y obtener solo texto
+function stripHtml(html) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
+}
+
+// Función debounce para mejorar el rendimiento
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Función para renderizar resultados
+function renderSearchResults(results) {
+    if (results.length === 0) {
+        searchResults.style.display = 'none';
+        return;
+    }
+
+    searchResults.innerHTML = '';
+    results.forEach(result => {
+        const div = document.createElement('div');
+        div.className = 'search-result-item';
+        div.innerHTML = `
+            <h4>${result.card.title}</h4>
+            <p>${stripHtml(result.card.content).substring(0, 100)}...</p>
+            <div class="search-result-list">Lista: ${result.listName}</div>
+        `;
+
+        div.addEventListener('click', () => {
+            currentCard = result.card;
+            currentList = result.listIndex;
+            currentCardIndex = result.cardIndex;
+            openCardModal(result.card);
+            searchResults.style.display = 'none';
+            searchInput.value = '';
+        });
+
+        searchResults.appendChild(div);
+    });
+
+    searchResults.style.display = 'block';
+}
+
+// Cerrar resultados al hacer clic fuera
+document.addEventListener('click', (e) => {
+    if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+        searchResults.style.display = 'none';
+    }
+});
+
+// Añadir al final de setupEventListeners()
+const menuToggle = document.querySelector('.menu-toggle');
+const headerActions = document.querySelector('.header-actions');
+
+menuToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    headerActions.classList.toggle('show');
+});
+
+document.addEventListener('click', (e) => {
+    if (!headerActions.contains(e.target) && !menuToggle.contains(e.target)) {
+        headerActions.classList.remove('show');
+    }
+});
+        }
+        
+        // Iniciar la aplicación
+        document.addEventListener('DOMContentLoaded', init);
+
+        // Modificar la función migrateImagePaths para incluir previewImage
+function migrateImagePaths() {
+    if (boardData && boardData.lists) {
+        boardData.lists.forEach(list => {
+            list.cards.forEach(card => {
+                // Corregir imagen de portada
+                if (card.previewImage) {
+                    if (card.previewImage.startsWith('file://')) {
+                        card.previewImage = 'images/' + card.previewImage.split('/').pop();
+                    } else if (card.previewImage.includes('/images/')) {
+                        card.previewImage = 'images/' + card.previewImage.split('/images/').pop();
+                    }
+                }
+                
+                // Corregir imágenes en el contenido
+                if (card.content) {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = card.content;
+                    tempDiv.querySelectorAll('img').forEach(img => {
+                        if (img.src.startsWith('file://')) {
+                            img.src = 'images/' + img.src.split('/').pop();
+                        } else if (img.src.includes('/images/')) {
+                            img.src = 'images/' + img.src.split('/images/').pop();
+                        }
+                    });
+                    card.content = tempDiv.innerHTML;
+                }
+            });
+        });
+        saveBoardData();
+    }
+}
+
+// Añadir detección de gestos táctiles
+function setupTouchEvents() {
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchMoveDistance = 0;
+    let touchStartTime = 0;
+
+    document.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        touchMoveDistance = 0;
+        touchStartTime = new Date().getTime();
+    }, { passive: true });
+
+    document.addEventListener('touchmove', (e) => {
+        if (!touchStartX || !touchStartY) return;
+
+        const touchEndX = e.touches[0].clientX;
+        const touchEndY = e.touches[0].clientY;
+        const deltaX = touchStartX - touchEndX;
+        const deltaY = touchStartY - touchEndY;
+
+        // Calcular la distancia total del movimiento
+        touchMoveDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+        // Permitir scroll en cualquier dirección
+        // No prevenir el comportamiento por defecto
+    }, { passive: true });
+
+    // Hacer estas variables globales para que estén disponibles en handleCardActivation
+    window.touchStartTime = 0;
+    window.touchMoveDistance = 0;
+}
+    </script>
 </body>
 </html>
