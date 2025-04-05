@@ -1244,8 +1244,18 @@ async function init() {
         // Modificar la función loadBoardData para que devuelva una promesa
         function loadBoardData() {
     return new Promise((resolve) => {
-        // Siempre intentar cargar primero desde el archivo
-        fetch('kanban-data.json?' + new Date().getTime()) // Añadir timestamp para evitar caché
+        // Primero intentar cargar desde localStorage
+        const savedData = localStorage.getItem('kanbanBoard');
+        if (savedData) {
+            boardData = JSON.parse(savedData);
+            console.log('Datos cargados desde localStorage');
+            renderBoard();
+            resolve();
+            return;
+        }
+
+        // Si no hay datos en localStorage, intentar cargar desde el archivo
+        fetch('kanban-data.json?' + new Date().getTime())
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Archivo kanban-data.json no encontrado');
@@ -1254,31 +1264,21 @@ async function init() {
             })
             .then(data => {
                 boardData = data;
-                // Actualizar también localStorage con los datos del archivo
                 localStorage.setItem('kanbanBoard', JSON.stringify(data));
                 renderBoard();
                 console.log('Datos cargados desde kanban-data.json');
                 resolve();
             })
             .catch(error => {
-                console.log('No se pudo cargar kanban-data.json:', error.message);
-                
-                // Solo usar localStorage si no se encontró el archivo
-                const savedData = localStorage.getItem('kanbanBoard');
-                if (savedData) {
-                    boardData = JSON.parse(savedData);
-                    console.log('Datos cargados desde localStorage');
-                } else {
-                    console.log('No hay datos guardados, usando tablero por defecto');
-                    boardData = {
-                        title: 'Mi Tablero Kanban Personal',
-                        lists: [
-                            { title: 'Por hacer', cards: [] },
-                            { title: 'En progreso', cards: [] },
-                            { title: 'Completado', cards: [] }
-                        ]
-                    };
-                }
+                console.log('No hay datos guardados, usando tablero por defecto');
+                boardData = {
+                    title: 'Mi Tablero Kanban Personal',
+                    lists: [
+                        { title: 'Por hacer', cards: [] },
+                        { title: 'En progreso', cards: [] },
+                        { title: 'Completado', cards: [] }
+                    ]
+                };
                 renderBoard();
                 resolve();
             });
